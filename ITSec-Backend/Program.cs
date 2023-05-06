@@ -1,10 +1,19 @@
 
+using ITSec_Backend.Controllers;
+using System.Data.SqlClient;
+using System.Runtime.CompilerServices;
+using System.Text;
+
 namespace ITSec_Backend
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            // Microsoft SQL 2022 Server. This is my connection string for the database.
+            DatabaseController databaseController = new DatabaseController("Server=localhost;Database=master;Trusted_Connection=True;");
+            databaseController.ConnectToDatabase();
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -26,7 +35,6 @@ namespace ITSec_Backend
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
