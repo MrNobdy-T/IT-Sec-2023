@@ -4,23 +4,18 @@ using System.Text;
 
 namespace ITSec_Backend.Controllers
 {
-   // [ApiController]
-   // [Route("[controller]")]
+    [ApiController]
+    [Route("api/[controller]")]
     public class DatabaseController : ControllerBase
     {
         private readonly string _connectionString;
 
         public DatabaseController(string connectionString)
         {
-            _connectionString = connectionString;
+            this._connectionString = connectionString;
         }
 
-       // [HttpGet(Name = "GetDatabase")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return default!;
-        }
-
+        [ApiExplorerSettings(IgnoreApi = true)]
         public void ConnectToDatabase()
         {
             try
@@ -29,14 +24,14 @@ namespace ITSec_Backend.Controllers
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
 
                 // Connect to SQL
-                Console.WriteLine("Connecting to SQL Server database ... ");
+                Console.WriteLine("Database controller: Connecting to SQL Server database ... ");
 
                 using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
-                    Console.WriteLine("Successfully connected!");
 
-                    this.CreateTestData(connection);
+                    Console.WriteLine("Database controller: Successfully connected!");
+                    this.ReadDatabase(connection);
                 }
             }
             catch (SqlException e)
@@ -48,95 +43,55 @@ namespace ITSec_Backend.Controllers
             Console.ReadKey(true);
         }
 
-        private void CreateTestData(SqlConnection connection)
+        private IEnumerable<string> ReadDatabase(SqlConnection connection)
         {
-            // Create a sample database
-            Console.Write("Dropping and creating database 'SampleDB' ... ");
-            String sql = "DROP DATABASE IF EXISTS [SampleDB]; CREATE DATABASE [SampleDB]";
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                command.ExecuteNonQuery();
-                Console.WriteLine("Done.");
-            }
+            List<string> databaseContent = new List<string>();
 
-            // Create a Table and insert some sample data
-            Console.Write("Creating sample table with data, press any key to continue...");
-            Console.ReadKey(true);
-            StringBuilder sb = new StringBuilder();
-            sb.Append("USE SampleDB; ");
-            sb.Append("CREATE TABLE Employees ( ");
-            sb.Append(" Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY, ");
-            sb.Append(" Name NVARCHAR(50), ");
-            sb.Append(" Location NVARCHAR(50) ");
-            sb.Append("); ");
-            sb.Append("INSERT INTO Employees (Name, Location) VALUES ");
-            sb.Append("(N'Jared', N'Australia'), ");
-            sb.Append("(N'Nikita', N'India'), ");
-            sb.Append("(N'Tom', N'Germany'); ");
-            sql = sb.ToString();
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                command.ExecuteNonQuery();
-                Console.WriteLine("Done.");
-            }
+            Console.WriteLine("Reading database content ...");
 
-            // INSERT demo
-            Console.Write("Inserting a new row into table, press any key to continue...");
-            Console.ReadKey(true);
-            sb.Clear();
-            sb.Append("INSERT Employees (Name, Location) ");
-            sb.Append("VALUES (@name, @location);");
-            sql = sb.ToString();
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            // Read users
+            Console.WriteLine("Users:");
+            using (SqlCommand command = new SqlCommand("SELECT * FROM Users", connection))
             {
-                command.Parameters.AddWithValue("@name", "Jake");
-                command.Parameters.AddWithValue("@location", "United States");
-                int rowsAffected = command.ExecuteNonQuery();
-                Console.WriteLine(rowsAffected + " row(s) inserted");
-            }
-
-            // UPDATE demo
-            String userToUpdate = "Nikita";
-            Console.Write("Updating 'Location' for user '" + userToUpdate + "', press any key to continue...");
-            Console.ReadKey(true);
-            sb.Clear();
-            sb.Append("UPDATE Employees SET Location = N'United States' WHERE Name = @name");
-            sql = sb.ToString();
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@name", userToUpdate);
-                int rowsAffected = command.ExecuteNonQuery();
-                Console.WriteLine(rowsAffected + " row(s) updated");
-            }
-
-            // DELETE demo
-            String userToDelete = "Jared";
-            Console.Write("Deleting user '" + userToDelete + "', press any key to continue...");
-            Console.ReadKey(true);
-            sb.Clear();
-            sb.Append("DELETE FROM Employees WHERE Name = @name;");
-            sql = sb.ToString();
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@name", userToDelete);
-                int rowsAffected = command.ExecuteNonQuery();
-                Console.WriteLine(rowsAffected + " row(s) deleted");
-            }
-
-            // READ demo
-            Console.WriteLine("Reading data from table, press any key to continue...");
-            Console.ReadKey(true);
-            sql = "SELECT Id, Name, Location FROM Employees;";
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("{0} {1} {2}", reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+                        databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
+                        Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
                     }
                 }
+            }
+
+            // Read administrators
+            Console.WriteLine("Administrators:");
+            using (SqlCommand command = new SqlCommand("SELECT * FROM Administrators", connection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
+                        Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
+                    }
+                }
+            }
+
+            Console.WriteLine("Done.");
+
+            return databaseContent;
+        }
+
+        [HttpGet("database", Name = "GetDatabase")]
+        public IEnumerable<string> Get()
+        {
+            // Build connection string
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
+            
+            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+            {
+                connection.Open();
+                return this.ReadDatabase(connection);
             }
         }
     }

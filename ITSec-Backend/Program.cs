@@ -1,4 +1,3 @@
-
 using ITSec_Backend.Controllers;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
@@ -10,15 +9,21 @@ namespace ITSec_Backend
     {
         public static void Main(string[] args)
         {
-            // Microsoft SQL 2022 Server. This is my connection string for the database.
-            DatabaseController databaseController = new DatabaseController("Server=localhost;Database=master;Trusted_Connection=True;");
+            string connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
+
+            // Connect to database and initialize it.
+            DatabaseBuilder databaseBuilder = new DatabaseBuilder(connectionString);
+            databaseBuilder.BuildDatabase(true);
+
+            // Test controller connection to Microsoft SQL 2022 Server Database.
+            DatabaseController databaseController = new DatabaseController(connectionString);
             databaseController.ConnectToDatabase();
 
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
