@@ -1,4 +1,5 @@
 using ITSec_Backend.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -38,6 +39,11 @@ namespace ITSec_Backend
             }
 
             app.UseHttpsRedirection();
+
+            app.MapGet("/database/GetDatabase", () =>
+            {
+                return databaseController.Get();
+            });
 
             app.UseAuthorization();
 
