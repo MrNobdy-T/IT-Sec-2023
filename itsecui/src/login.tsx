@@ -6,18 +6,25 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
+import { Http2ServerResponse } from "http2";
 const theme = createTheme();
 
 export default function SignIn() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    requesetAuthentification(
+      data.get("email") as string,
+      data.get("password") as string
+    );
+  };
+
+  const verifyLogin = (response: Http2ServerResponse) => {};
+
+  const requesetAuthentification = (name: string, password: string) => {
+    // assume that everything is cool
+    window.location.href = "/main";
+    console.log("Test");
   };
 
   return (
@@ -59,7 +66,7 @@ export default function SignIn() {
               label="Password"
               type="password"
               id="password"
-              //autoComplete="current-password"
+              autoComplete="current-password"
             />
             <Button
               type="submit"
@@ -69,13 +76,6 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"No account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>
