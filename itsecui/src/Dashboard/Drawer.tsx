@@ -6,15 +6,16 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import DehazeIcon from "@mui/icons-material/Dehaze";
+import { Icon } from "@mui/material";
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
 export default function SideDrawer() {
   const [state, setState] = React.useState({
     top: false,
-    left: true,
+    left: false,
     bottom: false,
     right: false,
   });
@@ -41,7 +42,7 @@ export default function SideDrawer() {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+        {["Dashboard", "Admin"].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemText primary={text} />
@@ -51,7 +52,7 @@ export default function SideDrawer() {
       </List>
       <Divider />
       <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
+        {["About"].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemText primary={text} />
@@ -64,9 +65,11 @@ export default function SideDrawer() {
 
   return (
     <div>
-      {(["left", "right", "top", "bottom"] as const).map((anchor) => (
+      {(["left"] as const).map((anchor) => (
         <React.Fragment key={anchor}>
-          <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
+          <Button onClick={toggleDrawer(anchor, true)}>
+            <DehazeIcon></DehazeIcon>
+          </Button>
           <Drawer
             anchor={anchor}
             open={state[anchor]}
