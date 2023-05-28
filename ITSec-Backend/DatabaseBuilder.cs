@@ -36,9 +36,11 @@ namespace ITSec_Backend
                     {
                         this.CreateUserTable(connection);
                         this.CreateAdminTable(connection);
+                        this.CreateTemperatureTable(connection);
 
                         this.InsertUsers(connection);
                         this.InsertAdmin(connection);
+                        this.InsertTemperature(connection);
                     }
                 }
             }
@@ -109,12 +111,49 @@ namespace ITSec_Backend
 
         private void CreateTemperatureTable(MySqlConnection connection) 
         {
+            Console.Write("Creating table 'Temperature' ... ");
 
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("DROP TABLE IF EXISTS Temperature; ");
+            sb.Append("CREATE TABLE Temperature ( ");
+            sb.Append(" Value DOUBLE NOT NULL, ");
+            sb.Append(" Time DATETIME NOT NULL ");
+            sb.Append("); ");
+            string sql = sb.ToString();
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            Console.WriteLine("Done.");
         }
 
         private void InsertTemperature(MySqlConnection connection)
         {
+            Random random = new Random();
+            DateTime now = DateTime.Now;
 
+            string sql = "INSERT INTO Temperature (Value, Time) VALUES (@value, @time);";
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    // Random temperature value between -10 and 30
+                    double randomValue = random.NextDouble() * 40 - 10;
+
+                    // Random timestamp within the past 2 hours
+                    DateTime randomTime = now.AddMinutes(random.Next(-120, 120));
+
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@value", randomValue);
+                    command.Parameters.AddWithValue("@time", randomTime);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine(rowsAffected + " row(s) inserted into Temperature table.");
+                }
+            }
         }
 
         private void CreateAdminTable(MySqlConnection connection)
