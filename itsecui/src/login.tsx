@@ -110,8 +110,8 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            {state.isErrorAttempt && <div></div>}
           </Box>
-          if(set)
         </Box>
       </Container>
     </ThemeProvider>
