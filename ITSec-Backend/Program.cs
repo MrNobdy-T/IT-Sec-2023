@@ -10,7 +10,7 @@ namespace ITSec_Backend
     {
         public static void Main(string[] args)
         {
-            string connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
+            string connectionString = "server=127.0.0.1;uid=root;pwd=root;";
 
             // Connect to database and initialize it.
             DatabaseBuilder databaseBuilder = new DatabaseBuilder(connectionString);

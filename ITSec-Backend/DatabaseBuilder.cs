@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Text;
+using MySqlConnector;
 
 namespace ITSec_Backend
 {
@@ -18,12 +19,12 @@ namespace ITSec_Backend
             try
             {
                 // Build connection string
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
+                MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(this._connectionString);
 
                 // Connect to SQL
                 Console.WriteLine("Database builder: Connecting to SQL Server database ... ");
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
 
@@ -50,33 +51,34 @@ namespace ITSec_Backend
             Console.ReadKey(true);
         }
 
-        private void CreateDatabase(SqlConnection connection)
+        private void CreateDatabase(MySqlConnection connection)
         {
             // Create a sample database
             Console.Write("Dropping and creating database 'SmartHomeDB' ... ");
-            String sql = "DROP DATABASE IF EXISTS [SmartHomeDB]; CREATE DATABASE [SmartHomeDB]";
+            String sql = "DROP DATABASE IF EXISTS SmartHomeDB; CREATE DATABASE SmartHomeDB; USE SmartHomeDB";
 
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.ExecuteNonQuery();
                 Console.WriteLine("Done.");
             }
         }
 
-        private void CreateUserTable(SqlConnection connection)
+        private void CreateUserTable(MySqlConnection connection)
         {
             Console.Write("Creating table 'Users' ... ");
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("DROP TABLE Users; ");
+
+            sb.Append("DROP TABLE IF EXISTS Users; ");
             sb.Append("CREATE TABLE Users ( ");
             sb.Append(" Username NVARCHAR(50) NOT NULL PRIMARY KEY, ");
             sb.Append(" Password NVARCHAR(50) NOT NULL ");
             sb.Append("); ");
             string sql = sb.ToString();
 
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.ExecuteNonQuery();
             }
@@ -84,11 +86,11 @@ namespace ITSec_Backend
             Console.WriteLine("Done.");
         }
 
-        private void InsertUsers(SqlConnection connection)
+        private void InsertUsers(MySqlConnection connection)
         {
             string sql = "INSERT INTO Users (Username, Password) VALUES (@username, @password);";
 
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@username", "clemens123");
                 command.Parameters.AddWithValue("@password", "hafenscher");
@@ -96,7 +98,7 @@ namespace ITSec_Backend
                 Console.WriteLine(rowsAffected + " row(s) inserted into Users table.");
             }
 
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@username", "onur123");
                 command.Parameters.AddWithValue("@password", "mete");
@@ -105,39 +107,39 @@ namespace ITSec_Backend
             }
         }
 
-        private void CreateTemperatureTable(SqlConnection connection) 
+        private void CreateTemperatureTable(MySqlConnection connection) 
         {
 
         }
 
-        private void InsertTemperature(SqlConnection connection)
+        private void InsertTemperature(MySqlConnection connection)
         {
 
         }
 
-        private void CreateAdminTable(SqlConnection connection)
+        private void CreateAdminTable(MySqlConnection connection)
         {
             Console.Write("Creating table 'Administrators' ... ");
 
             StringBuilder sb = new StringBuilder();
-
-            sb.Append("DROP TABLE Administrators; ");
+            
+            sb.Append("DROP TABLE IF EXISTS Administrators; ");
             sb.Append("CREATE TABLE Administrators ( ");
             sb.Append(" Username NVARCHAR(50) NOT NULL PRIMARY KEY, ");
             sb.Append(" Password NVARCHAR(50) NOT NULL ");
             sb.Append("); ");
             string sql = sb.ToString();
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.ExecuteNonQuery();
             }
             Console.WriteLine("Done.");
         }
 
-        private void InsertAdmin(SqlConnection connection)
+        private void InsertAdmin(MySqlConnection connection)
         {
             string sql = "INSERT INTO Administrators (Username, Password) VALUES (@username, @password);";
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@username", "admin123");
                 command.Parameters.AddWithValue("@password", "admin");

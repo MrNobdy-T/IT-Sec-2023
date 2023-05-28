@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Net;
 using System.Text;
+using MySqlConnector;
 
 namespace ITSec_Backend.Controllers
 {
@@ -10,7 +11,7 @@ namespace ITSec_Backend.Controllers
     [Route("api/[controller]")]
     public class DatabaseController : ControllerBase
     {
-        private readonly string _connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
+        private readonly string _connectionString = "server=127.0.0.1;uid=root;pwd=root;";
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public void ConnectToDatabase()
@@ -18,12 +19,12 @@ namespace ITSec_Backend.Controllers
             try
             {
                 // Build connection string
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
-
+                //SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
+                MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(_connectionString);
                 // Connect to SQL
                 Console.WriteLine("Database controller: Connecting to SQL Server database ... ");
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
 
@@ -40,7 +41,7 @@ namespace ITSec_Backend.Controllers
             Console.ReadKey(true);
         }
 
-        private IEnumerable<string> ReadDatabase(SqlConnection connection)
+        private IEnumerable<string> ReadDatabase(MySqlConnection connection)
         {
             List<string> databaseContent = new List<string>();
 
@@ -48,9 +49,9 @@ namespace ITSec_Backend.Controllers
 
             // Read users
             Console.WriteLine("Users:");
-            using (SqlCommand command = new SqlCommand("SELECT * FROM Users", connection))
+            using (MySqlCommand command = new MySqlCommand("SELECT * FROM Users", connection))
             {
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -62,9 +63,9 @@ namespace ITSec_Backend.Controllers
 
             // Read administrators
             Console.WriteLine("Administrators:");
-            using (SqlCommand command = new SqlCommand("SELECT * FROM Administrators", connection))
+            using (MySqlCommand command = new MySqlCommand("SELECT * FROM Administrators", connection))
             {
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -83,9 +84,9 @@ namespace ITSec_Backend.Controllers
         public IEnumerable<string> Get()
         {
             // Build connection string
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(this._connectionString);
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(this._connectionString);
             
-            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
             {
                 connection.Open();
                 return this.ReadDatabase(connection);
