@@ -50,10 +50,10 @@ namespace ITSec_Backend
 
             app.UseHttpsRedirection();
 
-            app.MapGet("/database/GetDatabase", () =>
-            {
-                return databaseController.Get();
-            });
+            //app.MapGet("/database/GetDatabase", () =>
+            //{
+            //    return databaseController.Get();
+            //});
 
             app.UseAuthorization();
 

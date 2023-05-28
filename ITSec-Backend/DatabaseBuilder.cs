@@ -50,7 +50,6 @@ namespace ITSec_Backend
             }
 
             Console.WriteLine("All done. Press any key to finish...");
-            Console.ReadKey(true);
         }
 
         private void CreateDatabase(MySqlConnection connection)
