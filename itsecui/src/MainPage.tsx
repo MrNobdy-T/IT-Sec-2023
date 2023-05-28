@@ -1,13 +1,9 @@
 import React from "react";
-import "./App.css";
+import SideDrawer from "./Dashboard/Drawer";
 import Dashboard from "./Dashboard/Dashboard";
 import { IChartData } from "./data/ChartData";
-import SideDrawer from "./Dashboard/Drawer";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import SignIn from "./login";
-import MainPage from "./MainPage";
 
-function App() {
+const MainPage = () => {
   const data: Array<IChartData> = [
     {
       name: "Page B ",
@@ -48,13 +44,15 @@ function App() {
   ];
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" Component={SignIn}></Route>
-        <Route path="/main" Component={MainPage}></Route>
-      </Routes>
-    </Router>
+    <div>
+      <SideDrawer></SideDrawer>
+      <Dashboard
+        energyData={data}
+        lightUsageData={data}
+        temperatureData={data}
+      ></Dashboard>
+    </div>
   );
-}
+};
 
-export default App;
+export default MainPage;
