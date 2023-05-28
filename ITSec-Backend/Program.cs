@@ -17,7 +17,7 @@ namespace ITSec_Backend
             databaseBuilder.BuildDatabase(true);
 
             // Test controller connection to Microsoft SQL 2022 Server Database.
-            DatabaseController databaseController = new DatabaseController(connectionString);
+            DatabaseController databaseController = new DatabaseController();
             databaseController.ConnectToDatabase();
 
             var builder = WebApplication.CreateBuilder(args);

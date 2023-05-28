@@ -105,6 +105,16 @@ namespace ITSec_Backend
             }
         }
 
+        private void CreateTemperatureTable(SqlConnection connection) 
+        {
+
+        }
+
+        private void InsertTemperature(SqlConnection connection)
+        {
+
+        }
+
         private void CreateAdminTable(SqlConnection connection)
         {
             Console.Write("Creating table 'Administrators' ... ");

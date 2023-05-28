@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ITSec_Backend.Data;
+using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -8,12 +9,7 @@ namespace ITSec_Backend.Controllers
     [Route("api/[controller]")]
     public class DatabaseController : ControllerBase
     {
-        private readonly string _connectionString;
-
-        public DatabaseController(string connectionString)
-        {
-            this._connectionString = connectionString;
-        }
+        private readonly string _connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public void ConnectToDatabase()
@@ -92,6 +88,45 @@ namespace ITSec_Backend.Controllers
             {
                 connection.Open();
                 return this.ReadDatabase(connection);
+            }
+        }
+
+        [HttpPost("database", Name = "PostLogin")]
+        public void Post([FromBody] LoginRequest loginRequest) 
+        {
+            // Build connection string
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(_connectionString);
+
+            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+            {
+                try
+                {
+                    // Open the connection
+                    connection.Open();
+
+                    // Create a SQL command to check the login credentials
+                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @username AND Password = @password";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@username", loginRequest.Username);
+                    command.Parameters.AddWithValue("@password", loginRequest.Password);
+
+                    int count = (int)command.ExecuteScalar();
+
+                    if (count > 0)
+                    {
+                        // Login successful
+                        // Perform any additional actions or redirect to the desired page
+                    }
+                    else
+                    {
+                        // Invalid login credentials
+                        // Handle the error or return an appropriate response
+                    }
+                }
+                catch
+                {
+                    // Handle any exceptions that occurred during the database operation
+                }
             }
         }
     }
