@@ -38,7 +38,6 @@ namespace ITSec_Backend.Controllers
             }
 
             Console.WriteLine("All done. Press any key to finish...");
-            Console.ReadKey(true);
         }
 
         private IEnumerable<string> ReadDatabase(MySqlConnection connection)
@@ -85,7 +84,7 @@ namespace ITSec_Backend.Controllers
         {
             // Build connection string
             MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(this._connectionString);
-            
+
             using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
             {
                 connection.Open();
@@ -94,7 +93,7 @@ namespace ITSec_Backend.Controllers
         }
 
         [HttpPost("login", Name = "PostLogin")]
-        public HttpResponseMessage PostLogin([FromBody] LoginRequest loginRequest)
+        public IActionResult PostLogin([FromBody] LoginRequest loginRequest)
         {
             // Build connection string
             MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(_connectionString);
@@ -118,26 +117,25 @@ namespace ITSec_Backend.Controllers
                     {
                         // Login successful
                         // Create a success response with a custom message
+                        Console.WriteLine("Success!");
                         var response = new HttpResponseMessage(HttpStatusCode.OK);
-                        response.Content = new StringContent("Login successful");
-                        return response;
+                        response.ReasonPhrase = "Login successful";
+                        return Ok(response);
                     }
-                    else
-                    {
-                        // Invalid login credentials
-                        // Handle the error or return an appropriate response
-                    }
+                    Console.WriteLine("Failed");
+                    // Invalid login credentials
+                    // Handle the error or return an appropriate response
                 }
                 catch
                 {
                     // Handle any exceptions that occurred during the database operation
                 }
             }
-
+            
             // Create a failure response with a custom message
             var errorResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            errorResponse.Content = new StringContent("Login invalid");
-            return errorResponse;
+            errorResponse.ReasonPhrase = "Login invalid";
+            return Unauthorized(errorResponse);
         }
     }
 }
