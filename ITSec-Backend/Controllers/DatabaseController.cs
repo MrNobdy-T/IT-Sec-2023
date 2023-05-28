@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Net;
 using System.Text;
 using MySqlConnector;
+using MaliciousLoginPackage;
 
 namespace ITSec_Backend.Controllers
 {
@@ -12,6 +13,8 @@ namespace ITSec_Backend.Controllers
     public class DatabaseController : ControllerBase
     {
         private readonly string _connectionString = "server=127.0.0.1;uid=root;pwd=root;database=smarthomedb";
+
+        private readonly LoginManager _loginManager = new LoginManager();
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public void ConnectToDatabase()
@@ -127,46 +130,27 @@ namespace ITSec_Backend.Controllers
         {
             // Build connection string
             MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(_connectionString);
+            HttpStatusCode code;
 
             using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
             {
-                try
-                {
-                    // Open the connection
-                    connection.Open();
-
-                    // Create a SQL command to check the login credentials
-                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @username AND Password = @password";
-                    MySqlCommand command = new MySqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@username", loginRequest.Username);
-                    command.Parameters.AddWithValue("@password", loginRequest.Password);
-
-                    Int64 count = (Int64)command.ExecuteScalar();
-
-                    if (count > 0)
-                    {
-                        // Login successful
-                        // Create a success response with a custom message
-                        Console.WriteLine("Success!");
-                        var response = new HttpResponseMessage(HttpStatusCode.OK);
-                        response.ReasonPhrase = "Login successful";
-                        return Ok(response);
-                    }
-
-                    Console.WriteLine("Failed");
-                    // Invalid login credentials
-                    // Handle the error or return an appropriate response
-                }
-                catch
-                {
-                    // Handle any exceptions that occurred during the database operation
-                }
+                code = this._loginManager.CheckLogin(connection, loginRequest.Username, loginRequest.Password);
             }
-            
-            // Create a failure response with a custom message
-            var errorResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            errorResponse.ReasonPhrase = "Login invalid";
-            return Unauthorized(errorResponse);
+
+            var response = new HttpResponseMessage(code);
+
+            switch (code)
+            {
+                case HttpStatusCode.Unauthorized:
+                    response.ReasonPhrase = "Login invalid";
+                    return Unauthorized(response);
+
+                case HttpStatusCode.OK:
+                    response.ReasonPhrase = "Login success";
+                    return Ok(response);
+            }
+
+            return Unauthorized(response);
         }
     }
 }

@@ -16,7 +16,6 @@ namespace ITSec_Backend
             DatabaseBuilder databaseBuilder = new DatabaseBuilder(connectionString);
             databaseBuilder.BuildDatabase(true);
 
-            // Test controller connection to Microsoft SQL 2022 Server Database.
             DatabaseController databaseController = new DatabaseController();
             databaseController.ConnectToDatabase();
 
@@ -37,6 +36,7 @@ namespace ITSec_Backend
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -49,11 +49,6 @@ namespace ITSec_Backend
             app.UseRouting();   
 
             app.UseHttpsRedirection();
-
-            //app.MapGet("/database/GetDatabase", () =>
-            //{
-            //    return databaseController.Get();
-            //});
 
             app.UseAuthorization();
 
