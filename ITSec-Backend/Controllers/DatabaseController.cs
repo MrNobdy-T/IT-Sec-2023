@@ -74,8 +74,23 @@ namespace ITSec_Backend.Controllers
                 }
             }
 
-            Console.WriteLine("Done.");
+            // Read temperature
+            Console.WriteLine("Temperature:");
+            using (MySqlCommand command = new MySqlCommand("SELECT * FROM Temperature", connection))
+            {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        double temperatureValue = Math.Round(reader.GetDouble(0), 2);
+                        DateTime timestamp = reader.GetDateTime(1);
+                        databaseContent.Add($"Value: {temperatureValue}, Time: {timestamp}");
+                        Console.WriteLine($"Value: {temperatureValue}, Time: {timestamp}");
+                    }
+                }
+            }
 
+            Console.WriteLine("Done.");
             return databaseContent;
         }
 
@@ -90,6 +105,35 @@ namespace ITSec_Backend.Controllers
                 connection.Open();
                 return this.ReadDatabase(connection);
             }
+        }
+
+        [HttpGet("temperature", Name = "GetTemperature")]
+        public IEnumerable<string> GetTemperature()
+        {
+            List<string> databaseContent = new List<string>();
+
+            // Retrieve data from the "Temperature" table
+            using (MySqlConnection connection = new MySqlConnection(this._connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT * FROM Temperature;";
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            double temperatureValue = Math.Round(reader.GetDouble(0), 2);
+                            DateTime timestamp = reader.GetDateTime(1);
+                            string entry = $"Value: {temperatureValue}, Time: {timestamp}";
+                            databaseContent.Add(entry);
+                        }
+                    }
+                }
+            }
+
+            return databaseContent;
         }
 
         [HttpPost("login", Name = "PostLogin")]
