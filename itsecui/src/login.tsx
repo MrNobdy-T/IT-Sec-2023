@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Http2ServerResponse } from "http2";
+import { cwd } from "process";
 const theme = createTheme();
 
 export default function SignIn() {
@@ -22,9 +23,36 @@ export default function SignIn() {
   const verifyLogin = (response: Http2ServerResponse) => {};
 
   const requesetAuthentification = (name: string, password: string) => {
-    // assume that everything is cool
-    window.location.href = "/main";
-    console.log("Test");
+    const loginData = {
+      username: name,
+      password: password,
+    };
+
+    // Send a POST request to the backend route
+    fetch("https://localhost:7211/api/Database/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginData),
+    })
+      .then((response) => {
+        if (response.status == 200) {
+          // Successful login, navigate to the main page
+          console.log(response);
+          window.location.href = "/main";
+          console.log("reached this");
+        } else {
+          console.log("reached failure!");
+          console.log(response);
+        }
+      })
+      .catch((error) => {
+        // Handle any network or server errors
+        console.error("Error:", error);
+      });
+
+    return;
   };
 
   return (
