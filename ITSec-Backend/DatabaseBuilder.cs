@@ -35,11 +35,9 @@ namespace ITSec_Backend
                     if (defaultTablesAndInserts) 
                     {
                         this.CreateUserTable(connection);
-                        this.CreateAdminTable(connection);
                         this.CreateTemperatureTable(connection);
 
                         this.InsertUsers(connection);
-                        this.InsertAdmin(connection);
                         this.InsertTemperature(connection);
                     }
                 }
@@ -71,11 +69,11 @@ namespace ITSec_Backend
 
             StringBuilder sb = new StringBuilder();
 
-
             sb.Append("DROP TABLE IF EXISTS Users; ");
             sb.Append("CREATE TABLE Users ( ");
             sb.Append(" Username NVARCHAR(50) NOT NULL PRIMARY KEY, ");
-            sb.Append(" Password NVARCHAR(50) NOT NULL ");
+            sb.Append(" Password NVARCHAR(50) NOT NULL, ");
+            sb.Append(" Role NVARCHAR(50) NOT NULL ");
             sb.Append("); ");
             string sql = sb.ToString();
 
@@ -89,20 +87,34 @@ namespace ITSec_Backend
 
         private void InsertUsers(MySqlConnection connection)
         {
-            string sql = "INSERT INTO Users (Username, Password) VALUES (@username, @password);";
+            string sql = "INSERT INTO Users (Username, Password, Role) VALUES (@username, @password, @role);";
 
+            // User onur
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@username", "clemens123");
                 command.Parameters.AddWithValue("@password", "hafenscher");
+                command.Parameters.AddWithValue("@role", "user");
                 int rowsAffected = command.ExecuteNonQuery();
                 Console.WriteLine(rowsAffected + " row(s) inserted into Users table.");
             }
 
+            // User clemens
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@username", "onur123");
                 command.Parameters.AddWithValue("@password", "mete");
+                command.Parameters.AddWithValue("@role", "user");
+                int rowsAffected = command.ExecuteNonQuery();
+                Console.WriteLine(rowsAffected + " row(s) inserted into Users table.");
+            }
+
+            // Admin
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@username", "admin123");
+                command.Parameters.AddWithValue("@password", "admin");
+                command.Parameters.AddWithValue("@role", "admin");
                 int rowsAffected = command.ExecuteNonQuery();
                 Console.WriteLine(rowsAffected + " row(s) inserted into Users table.");
             }
@@ -152,37 +164,6 @@ namespace ITSec_Backend
                     int rowsAffected = command.ExecuteNonQuery();
                     Console.WriteLine(rowsAffected + " row(s) inserted into Temperature table.");
                 }
-            }
-        }
-
-        private void CreateAdminTable(MySqlConnection connection)
-        {
-            Console.Write("Creating table 'Administrators' ... ");
-
-            StringBuilder sb = new StringBuilder();
-            
-            sb.Append("DROP TABLE IF EXISTS Administrators; ");
-            sb.Append("CREATE TABLE Administrators ( ");
-            sb.Append(" Username NVARCHAR(50) NOT NULL PRIMARY KEY, ");
-            sb.Append(" Password NVARCHAR(50) NOT NULL ");
-            sb.Append("); ");
-            string sql = sb.ToString();
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-            Console.WriteLine("Done.");
-        }
-
-        private void InsertAdmin(MySqlConnection connection)
-        {
-            string sql = "INSERT INTO Administrators (Username, Password) VALUES (@username, @password);";
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@username", "admin123");
-                command.Parameters.AddWithValue("@password", "admin");
-                int rowsAffected = command.ExecuteNonQuery();
-                Console.WriteLine(rowsAffected + " row(s) inserted into Administrators table.");
             }
         }
     }

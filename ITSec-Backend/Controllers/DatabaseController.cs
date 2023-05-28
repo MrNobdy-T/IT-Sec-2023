@@ -54,22 +54,8 @@ namespace ITSec_Backend.Controllers
                 {
                     while (reader.Read())
                     {
-                        databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
-                        Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
-                    }
-                }
-            }
-
-            // Read administrators
-            Console.WriteLine("Administrators:");
-            using (MySqlCommand command = new MySqlCommand("SELECT * FROM Administrators", connection))
-            {
-                using (MySqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
-                        Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}");
+                        databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}, Role: {reader.GetString(2)}");
+                        Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}, Role: {reader.GetString(2)}");
                     }
                 }
             }
@@ -166,6 +152,7 @@ namespace ITSec_Backend.Controllers
                         response.ReasonPhrase = "Login successful";
                         return Ok(response);
                     }
+
                     Console.WriteLine("Failed");
                     // Invalid login credentials
                     // Handle the error or return an appropriate response
