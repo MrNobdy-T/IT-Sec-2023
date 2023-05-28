@@ -1,6 +1,7 @@
 ﻿using ITSec_Backend.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using System.Net;
 using System.Text;
 
 namespace ITSec_Backend.Controllers
@@ -91,8 +92,8 @@ namespace ITSec_Backend.Controllers
             }
         }
 
-        [HttpPost("database", Name = "PostLogin")]
-        public void Post([FromBody] LoginRequest loginRequest) 
+        [HttpPost("login", Name = "PostLogin")]
+        public HttpResponseMessage PostLogin([FromBody] LoginRequest loginRequest)
         {
             // Build connection string
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(_connectionString);
@@ -115,7 +116,10 @@ namespace ITSec_Backend.Controllers
                     if (count > 0)
                     {
                         // Login successful
-                        // Perform any additional actions or redirect to the desired page
+                        // Create a success response with a custom message
+                        var response = new HttpResponseMessage(HttpStatusCode.OK);
+                        response.Content = new StringContent("Login successful");
+                        return response;
                     }
                     else
                     {
@@ -128,6 +132,11 @@ namespace ITSec_Backend.Controllers
                     // Handle any exceptions that occurred during the database operation
                 }
             }
+
+            // Create a failure response with a custom message
+            var errorResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            errorResponse.Content = new StringContent("Login invalid");
+            return errorResponse;
         }
     }
 }
