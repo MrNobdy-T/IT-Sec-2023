@@ -144,7 +144,7 @@ namespace ITSec_Backend
                     double randomValue = random.NextDouble() * 40 - 10;
 
                     // Random timestamp within the past 2 hours
-                    DateTime randomTime = now.AddMinutes(random.Next(-120, 120));
+                    DateTime randomTime = now.AddMinutes(random.Next(-120, 0));
 
                     command.Parameters.Clear();
                     command.Parameters.AddWithValue("@value", randomValue);
