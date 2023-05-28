@@ -11,7 +11,7 @@ namespace ITSec_Backend.Controllers
     [Route("api/[controller]")]
     public class DatabaseController : ControllerBase
     {
-        private readonly string _connectionString = "server=127.0.0.1;uid=root;pwd=root;";
+        private readonly string _connectionString = "server=127.0.0.1;uid=root;pwd=root;database=smarthomedb";
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public void ConnectToDatabase()
@@ -97,9 +97,9 @@ namespace ITSec_Backend.Controllers
         public HttpResponseMessage PostLogin([FromBody] LoginRequest loginRequest)
         {
             // Build connection string
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(_connectionString);
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(_connectionString);
 
-            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
             {
                 try
                 {
@@ -108,11 +108,11 @@ namespace ITSec_Backend.Controllers
 
                     // Create a SQL command to check the login credentials
                     string query = "SELECT COUNT(*) FROM Users WHERE Username = @username AND Password = @password";
-                    SqlCommand command = new SqlCommand(query, connection);
+                    MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@username", loginRequest.Username);
                     command.Parameters.AddWithValue("@password", loginRequest.Password);
 
-                    int count = (int)command.ExecuteScalar();
+                    Int64 count = (Int64)command.ExecuteScalar();
 
                     if (count > 0)
                     {
