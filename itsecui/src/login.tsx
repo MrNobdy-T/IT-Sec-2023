@@ -6,11 +6,15 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Http2ServerResponse } from "http2";
-import { cwd } from "process";
+import { useState } from "react";
 const theme = createTheme();
 
 export default function SignIn() {
+  const [state, setState] = useState({
+    isLoggedIn: false,
+    isErrorAttempt: false,
+  });
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -19,8 +23,6 @@ export default function SignIn() {
       data.get("password") as string
     );
   };
-
-  const verifyLogin = (response: Http2ServerResponse) => {};
 
   const requesetAuthentification = (name: string, password: string) => {
     const loginData = {
@@ -42,17 +44,21 @@ export default function SignIn() {
           console.log(response);
           window.location.href = "/main";
           console.log("reached this");
+          setState({
+            isLoggedIn: true,
+            isErrorAttempt: false,
+          });
         } else {
-          console.log("reached failure!");
-          console.log(response);
+          setState({
+            isLoggedIn: false,
+            isErrorAttempt: true,
+          });
         }
       })
       .catch((error) => {
         // Handle any network or server errors
         console.error("Error:", error);
       });
-
-    return;
   };
 
   return (
@@ -104,6 +110,7 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            {state.isErrorAttempt && <div></div>}
           </Box>
         </Box>
       </Container>
