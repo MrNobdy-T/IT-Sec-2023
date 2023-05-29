@@ -152,5 +152,35 @@ namespace ITSec_Backend.Controllers
 
             return Unauthorized(response);
         }
+
+        [HttpGet("role", Name = "GetRole")]
+        public string GetRole([FromQuery] LoginRequest loginRequest)
+        {
+            string role = string.Empty;
+
+            // Build connection string
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(this._connectionString);
+
+            using (MySqlConnection connection = new MySqlConnection(builder.ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand command = new MySqlCommand("SELECT Role FROM Users WHERE Username = @username AND Password = @password", connection))
+                {
+                    command.Parameters.AddWithValue("@username", loginRequest.Username);
+                    command.Parameters.AddWithValue("@password", loginRequest.Password);
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            role = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+
+            return role;
+        }
     }
 }
