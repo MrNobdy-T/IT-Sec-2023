@@ -7,17 +7,33 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
+import { User } from "./AuthenticatedUser";
 const theme = createTheme();
 
-export default function SignIn() {
-  const [state, setState] = useState({
+interface IState {
+  isLoggedIn: boolean;
+  isErrorAttempt: boolean;
+  props: IProps;
+}
+
+interface IProps {
+  func: (name: string, password: string) => void;
+}
+
+export default function SignIn(props: IProps) {
+  const [state, setState] = useState<IState>({
     isLoggedIn: false,
     isErrorAttempt: false,
+    props: props,
   });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    state.props!.func(
+      data.get("email") as string,
+      data.get("password") as string
+    );
     requesetAuthentification(
       data.get("email") as string,
       data.get("password") as string
@@ -39,19 +55,18 @@ export default function SignIn() {
       body: JSON.stringify(loginData),
     })
       .then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           // Successful login, navigate to the main page
-          console.log(response);
-          window.location.href = "/main";
-          console.log("reached this");
           setState({
             isLoggedIn: true,
             isErrorAttempt: false,
+            props: props,
           });
         } else {
           setState({
             isLoggedIn: false,
             isErrorAttempt: true,
+            props: props,
           });
         }
       })
@@ -110,7 +125,7 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            {state.isErrorAttempt && <div></div>}
+            {state.isErrorAttempt && <div>Invalid password and username!</div>}
           </Box>
         </Box>
       </Container>

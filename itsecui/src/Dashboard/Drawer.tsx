@@ -8,17 +8,36 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import DehazeIcon from "@mui/icons-material/Dehaze";
-import { Icon } from "@mui/material";
+import { User } from "../AuthenticatedUser";
+import SettingsPage from "../SettingsPage";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
-export default function SideDrawer() {
+interface IProps {
+  user?: User;
+}
+
+export default function SideDrawer(props: IProps) {
+  const navigation = useNavigate();
+  const location = useLocation();
   const [state, setState] = React.useState({
     top: false,
     left: false,
     bottom: false,
     right: false,
+    props: props,
   });
+
+  React.useEffect(() => {
+    if (state.props.user === null) {
+      console.log(location.state);
+      setState({ ...state, props: (props.user = location.state) });
+    }
+  });
+
+  const elements =
+    props.user?.role === "admin" ? ["Dashboard", "Admin"] : ["Dashboard"];
 
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
@@ -42,10 +61,22 @@ export default function SideDrawer() {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {["Dashboard", "Admin"].map((text, index) => (
+        {elements.map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text} />
+              <ListItemText
+                primary={text}
+                onClick={() => {
+                  console.log(text);
+                  switch (text) {
+                    case "Admin":
+                      navigation("/admin", { state: state.props.user });
+                      break;
+                    case "Dashboard":
+                      navigation("/", { state: state.props.user });
+                  }
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}

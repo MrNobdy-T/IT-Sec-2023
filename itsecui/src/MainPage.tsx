@@ -1,9 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SideDrawer from "./Dashboard/Drawer";
 import Dashboard from "./Dashboard/Dashboard";
 import { IChartData } from "./data/ChartData";
+import { AuthenticatedUser, User } from "./AuthenticatedUser";
+import SignIn from "./login";
+import { useNavigate } from "react-router-dom";
+
+interface IState {
+  isLoggedIn: Boolean;
+  user?: User;
+}
 
 const MainPage = () => {
+  const navigation = useNavigate();
+  const [state, setState] = useState<IState>({
+    isLoggedIn: false,
+  });
+
+  useEffect(() => {});
+
+  const getRole = (name: string, password: string): void => {
+    let user: User = { name: name, password: password, isAuthenticated: true };
+    setState({
+      user: user,
+      isLoggedIn: true,
+    });
+
+    const url = `https://localhost:7211/api/Database/role?Username=${encodeURIComponent(
+      user.name
+    )}&Password=${encodeURIComponent(user.password)}`;
+    fetch(url).then((x) =>
+      x.text().then((y) => {
+        user.role = y;
+        setState({
+          isLoggedIn: true,
+          user: user,
+        });
+      })
+    );
+  };
+
+  const signIn = SignIn({ func: getRole });
+
   const data: Array<IChartData> = [
     {
       name: "Page B ",
@@ -45,12 +83,17 @@ const MainPage = () => {
 
   return (
     <div>
-      <SideDrawer></SideDrawer>
-      <Dashboard
-        energyData={data}
-        lightUsageData={data}
-        temperatureData={data}
-      ></Dashboard>
+      {!state.isLoggedIn && signIn}
+      {state.isLoggedIn && (
+        <div>
+          <SideDrawer user={state.user}></SideDrawer>
+          <Dashboard
+            energyData={data}
+            lightUsageData={data}
+            temperatureData={data}
+          ></Dashboard>
+        </div>
+      )}
     </div>
   );
 };
