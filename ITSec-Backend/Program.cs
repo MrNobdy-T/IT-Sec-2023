@@ -1,60 +1,45 @@
+using ITSec_Backend;
 using ITSec_Backend.Controllers;
-using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
-using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace ITSec_Backend
+string connectionString = "server=127.0.0.1;uid=root;pwd=root;";
+
+// Connect to database and initialize it.
+DatabaseBuilder databaseBuilder = new(connectionString);
+databaseBuilder.BuildDatabase(true);
+
+DatabaseController databaseController = new();
+databaseController.ConnectToDatabase();
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            string connectionString = "server=127.0.0.1;uid=root;pwd=root;";
+    options.AddPolicy("CorsPolicy",
+        builder => builder
+            .WithOrigins("http://localhost:3000") // Add your React app's origin
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 
-            // Connect to database and initialize it.
-            DatabaseBuilder databaseBuilder = new DatabaseBuilder(connectionString);
-            databaseBuilder.BuildDatabase(true);
+var app = builder.Build();
 
-            DatabaseController databaseController = new DatabaseController();
-            databaseController.ConnectToDatabase();
-
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder
-                        .WithOrigins("http://localhost:3000") // Add your React app's origin
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
-            });
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-            app.UseCors("CorsPolicy");
-            app.UseRouting();   
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
+app.UseRouting();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
