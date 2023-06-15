@@ -27,65 +27,11 @@ public class DatabaseController : ControllerBase
 
             using MySqlConnection connection = new(builder.ConnectionString);
             connection.Open();
-
-            Console.WriteLine("Database controller: Successfully connected!");
-            ReadDatabase(connection);
         }
         catch (SqlException e)
         {
             Console.WriteLine(e.ToString());
         }
-
-        Console.WriteLine("All done. Press any key to finish...");
-    }
-
-    private static IEnumerable<string> ReadDatabase(MySqlConnection connection)
-    {
-        List<string> databaseContent = new();
-
-        Console.WriteLine("Reading database content ...");
-
-        // Read users
-        Console.WriteLine("Users:");
-        using (MySqlCommand command = new("SELECT * FROM Users", connection))
-        {
-            using MySqlDataReader reader = command.ExecuteReader();
-            
-            while (reader.Read())
-            {
-                databaseContent.Add($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}, Role: {reader.GetString(2)}");
-                Console.WriteLine($"Username: {reader.GetString(0)}, Password: {reader.GetString(1)}, Role: {reader.GetString(2)}");
-            }
-        }
-
-        // Read temperature
-        Console.WriteLine("Temperature:");
-        using (MySqlCommand command = new("SELECT * FROM Temperature", connection))
-        {
-            using MySqlDataReader reader = command.ExecuteReader();
-            
-            while (reader.Read())
-            {
-                double temperatureValue = Math.Round(reader.GetDouble(0), 2);
-                DateTime timestamp = reader.GetDateTime(1);
-                databaseContent.Add($"Value: {temperatureValue}, Time: {timestamp}");
-                Console.WriteLine($"Value: {temperatureValue}, Time: {timestamp}");
-            }
-        }
-
-        Console.WriteLine("Done.");
-        return databaseContent;
-    }
-
-    [HttpGet("database", Name = "GetDatabase")]
-    public IEnumerable<string> Get()
-    {
-        // Build connection string
-        MySqlConnectionStringBuilder builder = new(_connectionString);
-
-        using MySqlConnection connection = new(builder.ConnectionString);
-        connection.Open();
-        return ReadDatabase(connection);
     }
 
     [HttpGet("temperature", Name = "GetTemperature")]
